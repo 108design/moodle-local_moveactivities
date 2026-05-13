@@ -20,7 +20,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Copy/move activities between courses';
+$string['pluginname'] = 'Bulk copy/move activities between courses';
 $string['moveactivities'] = 'Copy/move activities';
 $string['moveactivities:move'] = 'Copy/move activities between courses';
 $string['sourcecourse'] = 'Source course';
