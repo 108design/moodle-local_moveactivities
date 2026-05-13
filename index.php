@@ -186,8 +186,8 @@ echo html_writer::select($modes, 'targetsectionmode', $targetsectionmode, false,
 
 echo html_writer::tag('label', get_string('actionmode', 'local_moveactivities'), ['for' => 'actionmode', 'class' => 'form-label mb-1 font-weight-bold']);
 $actionmodes = [
-    'move' => get_string('actionmode_move', 'local_moveactivities'),
     'copy' => get_string('actionmode_copy', 'local_moveactivities'),
+    'move' => get_string('actionmode_move', 'local_moveactivities'),
 ];
 echo html_writer::select($actionmodes, 'actionmode', $actionmode, false, ['id' => 'actionmode', 'class' => 'form-select mb-3']);
 echo html_writer::div(
@@ -208,6 +208,8 @@ echo html_writer::end_div();
 echo html_writer::end_div();
 
 echo html_writer::end_tag('form');
+
+$moveconfirmquestionjs = json_encode(get_string('moveconfirmquestion', 'local_moveactivities'));
 
 $js = <<<JS
 (function() {
@@ -253,7 +255,7 @@ $js = <<<JS
         return;
       }
       if (actionMode.value === 'move') {
-        const ok = window.confirm(M.util.get_string('moveconfirmquestion', 'local_moveactivities'));
+        const ok = window.confirm({$moveconfirmquestionjs});
         if (!ok) {
           e.preventDefault();
         }

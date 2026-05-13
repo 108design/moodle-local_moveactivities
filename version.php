@@ -24,7 +24,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_moveactivities';
-$plugin->version = 2026051317;
+$plugin->version = 2026051318;
 $plugin->requires = 2024042200; // Moodle 4.5.
 $plugin->maturity = MATURITY_BETA;
-$plugin->release = '0.17';
+$plugin->release = '0.18';
