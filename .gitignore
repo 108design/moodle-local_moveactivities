@@ -1,0 +1,25 @@
+.DS_Store
+Thumbs.db
+
+# IDE/editor
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log
+
+# Dependency/vendor artifacts (if ever used locally)
+vendor/
+
+# Node artifacts (if tooling gets added)
+node_modules/
+
+# PHPUnit / coverage / temp
+.phpunit.result.cache
+coverage/
+tmp/
+
+# Moodle local cache/config that should not be in plugin repo
+config.php
+cache/
