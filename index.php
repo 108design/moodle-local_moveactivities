@@ -190,12 +190,17 @@ $actionmodes = [
     'copy' => get_string('actionmode_copy', 'local_moveactivities'),
 ];
 echo html_writer::select($actionmodes, 'actionmode', $actionmode, false, ['id' => 'actionmode', 'class' => 'form-select mb-3']);
+echo html_writer::div(
+    get_string('moveconfirmwarning', 'local_moveactivities'),
+    'alert alert-danger py-2 px-3 mb-3' . ($actionmode === 'move' ? '' : ' d-none'),
+    ['id' => 'move-warning']
+);
 
 echo html_writer::start_div('mb-3 mt-auto');
 echo html_writer::end_div();
 
 echo html_writer::start_div('', ['style' => 'position:sticky;bottom:0;background:#fff;padding:.75rem 0 .25rem 0;border-top:1px solid #ddd;z-index:10;']);
-echo html_writer::empty_tag('input', ['type' => 'submit', 'name' => 'enqueue', 'class' => 'btn btn-primary w-100', 'value' => get_string('enqueue', 'local_moveactivities')]);
+echo html_writer::empty_tag('input', ['type' => 'submit', 'name' => 'enqueue', 'id' => 'enqueue-btn', 'class' => 'btn ' . ($actionmode === 'move' ? 'btn-danger' : 'btn-primary') . ' w-100', 'value' => get_string('enqueue', 'local_moveactivities')]);
 echo html_writer::end_div();
 
 echo html_writer::end_div();
@@ -217,6 +222,45 @@ $js = <<<JS
 
   const selectAllBtn = document.getElementById('select-all-visible');
   const clearBtn = document.getElementById('clear-selection');
+  const form = document.getElementById('moveactivities-form');
+  const actionMode = document.getElementById('actionmode');
+  const moveWarning = document.getElementById('move-warning');
+  const enqueueBtn = document.getElementById('enqueue-btn');
+
+  function updateMoveUi() {
+    if (!actionMode) {
+      return;
+    }
+    const isMove = actionMode.value === 'move';
+    if (moveWarning) {
+      moveWarning.classList.toggle('d-none', !isMove);
+    }
+    if (enqueueBtn) {
+      enqueueBtn.classList.toggle('btn-danger', isMove);
+      enqueueBtn.classList.toggle('btn-primary', !isMove);
+    }
+  }
+
+  if (actionMode) {
+    actionMode.addEventListener('change', updateMoveUi);
+    updateMoveUi();
+  }
+
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      const submitter = e.submitter;
+      if (!submitter || submitter.name !== 'enqueue' || !actionMode) {
+        return;
+      }
+      if (actionMode.value === 'move') {
+        const ok = window.confirm(M.util.get_string('moveconfirmquestion', 'local_moveactivities'));
+        if (!ok) {
+          e.preventDefault();
+        }
+      }
+    });
+  }
+
   if (selectAllBtn) {
     selectAllBtn.addEventListener('click', function() {
       document.querySelectorAll('.activity-checkbox').forEach(cb => cb.checked = true);
