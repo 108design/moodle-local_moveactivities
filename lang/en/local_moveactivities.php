@@ -1,22 +1,11 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of a 108design source-available software product.
 //
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// Copyright (C) 2026 Andreas Giesen <andreas@108design.com>
 //
 // @package    local_moveactivities
-// @copyright  2026 Andreas Giesen <info@108design.com>
-// @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+// @copyright  2026 Andreas Giesen <andreas@108design.com>
+// @license    See LICENSE.md for the full terms.
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -79,4 +68,19 @@ $string['jobstatus_queued'] = 'Queued';
 $string['jobstatus_running'] = 'Running';
 $string['jobstatus_done'] = 'Done';
 $string['jobstatus_done_with_errors'] = 'Done with errors';
-$string['privacy:metadata'] = 'The local_moveactivities plugin does not store personal data.';
+$string['privacy:path'] = 'Move/copy jobs';
+$string['privacy:metadata:job'] = 'A move or copy job created by a user.';
+$string['privacy:metadata:job:userid'] = 'The user who created the job.';
+$string['privacy:metadata:job:sourcecourseid'] = 'The source course ID.';
+$string['privacy:metadata:job:targetcourseid'] = 'The target course ID.';
+$string['privacy:metadata:job:deletesource'] = 'Whether the source activity is deleted after copying.';
+$string['privacy:metadata:job:status'] = 'The processing status of the job.';
+$string['privacy:metadata:job:timecreated'] = 'When the job was created.';
+$string['privacy:metadata:job:timemodified'] = 'When the job was last updated.';
+$string['privacy:metadata:item'] = 'An activity processed as part of a move or copy job.';
+$string['privacy:metadata:item:cmid'] = 'The source course module ID.';
+$string['privacy:metadata:item:activityname'] = 'The activity name recorded for the job.';
+$string['privacy:metadata:item:status'] = 'The processing status of the activity.';
+$string['privacy:metadata:item:message'] = 'The processing result or error message.';
+$string['privacy:metadata:item:timecreated'] = 'When the job item was created.';
+$string['privacy:metadata:item:timemodified'] = 'When the job item was last updated.';

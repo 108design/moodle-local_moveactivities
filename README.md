@@ -1,4 +1,4 @@
-# local_moveactivities (Moodle 4.5 LTS)
+# local_moveactivities
 
 Bulk move activities from one course to another with fewer clicks.
 
@@ -13,7 +13,13 @@ Bulk move activities from one course to another with fewer clicks.
   3. Place in section named as source course (or first section)
   4. Optionally delete original activity from source course (move mode)
 
-The UI now queues a background job and returns quickly (to avoid request timeouts).
+The UI queues a background job and returns quickly to avoid request timeouts.
+
+## Compatibility
+
+- Moodle 4.5 through 5.2 inclusive
+- PHP versions supported by the selected Moodle release
+- Database access uses Moodle's DML API and is intended to work with both MySQL/MariaDB and PostgreSQL
 
 ## URL
 
@@ -34,10 +40,23 @@ Default role grants in this plugin:
 - Editing teacher
 - Manager
 
+## Privacy
+
+The plugin stores the initiating user ID and job history, including source and
+target course IDs, activity names, status messages, and timestamps. Its Moodle
+Privacy API provider supports metadata declaration, export, and deletion.
+
+## Licence
+
+This plugin is source-available commercial software and is not open source.
+See [LICENSE.md](LICENSE.md) for the full terms. Moodle itself and its APIs
+remain subject to their respective licences.
+
 ## Notes
 
-- This is an MVP implementation with a simple GUI.
 - Includes false-positive delete handling (some module delete flows may return false although module is already gone).
 - Uses ad-hoc background tasks with chunked processing to avoid 504 timeouts.
+- Runs each background job as the user who created it and re-checks permissions during processing.
+- Serialises processing per job to prevent duplicate work from overlapping tasks.
 - Job page shows status per item and allows retry of failed items.
 - Ensure Moodle cron runs regularly so queued jobs are processed.

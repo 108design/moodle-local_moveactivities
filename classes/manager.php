@@ -1,22 +1,11 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of a 108design source-available software product.
 //
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// Copyright (C) 2026 Andreas Giesen <andreas@108design.com>
 //
 // @package    local_moveactivities
-// @copyright  2026 Andreas Giesen <info@108design.com>
-// @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+// @copyright  2026 Andreas Giesen <andreas@108design.com>
+// @license    See LICENSE.md for the full terms.
 
 namespace local_moveactivities;
 
@@ -31,6 +20,7 @@ use backup_controller;
 use core\task\manager as task_manager;
 use context_course;
 use context_module;
+use core\lock\lock_config;
 use restore_controller;
 
 /**
@@ -179,6 +169,7 @@ class manager {
         global $DB;
 
         if (!$usesourcename) {
+            course_create_sections_if_missing($targetcourseid, [1]);
             return 1;
         }
 
@@ -220,7 +211,8 @@ class manager {
             $cm = get_coursemodule_from_id(null, $cmid, 0, false, MUST_EXIST);
             $sourcecourse = get_course($cm->course);
 
-            require_login($sourcecourse);
+            require_capability('local/moveactivities:move', context_course::instance($sourcecourse->id));
+            require_capability('local/moveactivities:move', context_course::instance($targetcourseid));
             require_capability('moodle/backup:backupactivity', context_module::instance($cmid));
             require_capability('moodle/restore:restoreactivity', context_course::instance($targetcourseid));
 
@@ -308,6 +300,7 @@ class manager {
     ): int {
         global $DB;
 
+        $targetsectionmode = $targetsectionmode === 'sourcecoursename' ? 'sourcecoursename' : 'first';
         $now = time();
         $job = (object)[
             'userid' => $userid,
@@ -334,14 +327,15 @@ class manager {
             $DB->insert_record('local_moveactivities_item', $item);
         }
 
-        self::queue_job_task($jobid);
+        self::queue_job_task($jobid, $userid);
         return $jobid;
     }
 
     /** Queue processor task. */
-    public static function queue_job_task(int $jobid): void {
+    public static function queue_job_task(int $jobid, int $userid): void {
         $task = new \local_moveactivities\task\process_job();
         $task->set_custom_data(['jobid' => $jobid]);
+        $task->set_userid($userid);
         task_manager::queue_adhoc_task($task);
     }
 
@@ -349,45 +343,61 @@ class manager {
     public static function process_job(int $jobid): void {
         global $DB;
 
-        $job = $DB->get_record('local_moveactivities_job', ['id' => $jobid], '*', MUST_EXIST);
-        if ($job->status === 'done') {
+        $lockfactory = lock_config::get_lock_factory('local_moveactivities');
+        $lock = $lockfactory->get_lock('job_' . $jobid, 0);
+        if (!$lock) {
             return;
         }
-        $job->status = 'running';
-        $job->timemodified = time();
-        $DB->update_record('local_moveactivities_job', $job);
 
-        $sourcecourse = get_course((int)$job->sourcecourseid);
-        $targetsectionnum = self::resolve_target_sectionnum(
-            (int)$job->targetcourseid,
-            $sourcecourse->fullname,
-            $job->targetsectionmode === 'sourcecoursename'
-        );
+        try {
+            $job = $DB->get_record('local_moveactivities_job', ['id' => $jobid], '*', MUST_EXIST);
+            if (in_array($job->status, ['done', 'done_with_errors'], true)) {
+                return;
+            }
+            $job->status = 'running';
+            $job->timemodified = time();
+            $DB->update_record('local_moveactivities_job', $job);
 
-        $items = $DB->get_records('local_moveactivities_item', ['jobid' => $jobid, 'status' => 'queued'], 'id ASC', '*', 0, self::CHUNK_SIZE);
+            $sourcecourse = get_course((int)$job->sourcecourseid);
+            $targetsectionnum = self::resolve_target_sectionnum(
+                (int)$job->targetcourseid,
+                $sourcecourse->fullname,
+                $job->targetsectionmode === 'sourcecoursename'
+            );
 
-        foreach ($items as $item) {
-            $result = self::move_activity((int)$item->cmid, (int)$job->targetcourseid, $targetsectionnum, (bool)$job->deletesource);
-            $item->status = $result['success'] ? 'done' : 'failed';
-            $item->message = $result['message'];
-            $item->timemodified = time();
-            $DB->update_record('local_moveactivities_item', $item);
-        }
+            $items = $DB->get_records('local_moveactivities_item', ['jobid' => $jobid, 'status' => 'queued'],
+                'id ASC', '*', 0, self::CHUNK_SIZE);
 
-        rebuild_course_cache((int)$job->targetcourseid, true);
-        if ((bool)$job->deletesource) {
-            rebuild_course_cache((int)$job->sourcecourseid, true);
-        }
+            foreach ($items as $item) {
+                $result = self::move_activity(
+                    (int)$item->cmid,
+                    (int)$job->targetcourseid,
+                    $targetsectionnum,
+                    (bool)$job->deletesource
+                );
+                $item->status = $result['success'] ? 'done' : 'failed';
+                $item->message = $result['message'];
+                $item->timemodified = time();
+                $DB->update_record('local_moveactivities_item', $item);
+            }
 
-        $remaining = $DB->count_records('local_moveactivities_item', ['jobid' => $jobid, 'status' => 'queued']);
-        $failed = $DB->count_records('local_moveactivities_item', ['jobid' => $jobid, 'status' => 'failed']);
+            rebuild_course_cache((int)$job->targetcourseid, true);
+            if ((bool)$job->deletesource) {
+                rebuild_course_cache((int)$job->sourcecourseid, true);
+            }
 
-        $job->status = $remaining > 0 ? 'running' : ($failed > 0 ? 'done_with_errors' : 'done');
-        $job->timemodified = time();
-        $DB->update_record('local_moveactivities_job', $job);
+            $remaining = $DB->count_records('local_moveactivities_item', ['jobid' => $jobid, 'status' => 'queued']);
+            $failed = $DB->count_records('local_moveactivities_item', ['jobid' => $jobid, 'status' => 'failed']);
 
-        if ($remaining > 0) {
-            self::queue_job_task($jobid);
+            $job->status = $remaining > 0 ? 'running' : ($failed > 0 ? 'done_with_errors' : 'done');
+            $job->timemodified = time();
+            $DB->update_record('local_moveactivities_job', $job);
+
+            if ($remaining > 0) {
+                self::queue_job_task($jobid, (int)$job->userid);
+            }
+        } finally {
+            $lock->release();
         }
     }
 
@@ -414,6 +424,6 @@ class manager {
         $job->status = 'queued';
         $job->timemodified = time();
         $DB->update_record('local_moveactivities_job', $job);
-        self::queue_job_task($jobid);
+        self::queue_job_task($jobid, $userid);
     }
 }
