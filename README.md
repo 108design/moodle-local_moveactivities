@@ -46,12 +46,6 @@ The plugin stores the initiating user ID and job history, including source and
 target course IDs, activity names, status messages, and timestamps. Its Moodle
 Privacy API provider supports metadata declaration, export, and deletion.
 
-## Licence
-
-This plugin is source-available commercial software and is not open source.
-See [LICENSE.md](LICENSE.md) for the full terms. Moodle itself and its APIs
-remain subject to their respective licences.
-
 ## Notes
 
 - Includes false-positive delete handling (some module delete flows may return false although module is already gone).
@@ -60,3 +54,9 @@ remain subject to their respective licences.
 - Serialises processing per job to prevent duplicate work from overlapping tasks.
 - Job page shows status per item and allows retry of failed items.
 - Ensure Moodle cron runs regularly so queued jobs are processed.
+
+Moodle itself and its APIs remain subject to their respective licences.
+
+## License
+
+This is a 108design source-available commercial software license, not an open-source license. See [LICENSE.md](https://github.com/108design/moodle-local_moveactivities/blob/main/LICENSE.md) for the full terms.
