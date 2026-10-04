@@ -2,6 +2,38 @@
 
 Copy or move multiple activities between Moodle courses in one background job.
 
+## Screenshots
+
+<details>
+<summary>View screenshots (4)</summary>
+
+Click a preview to open the full-size screenshot.
+
+<table>
+<tr>
+<td align="center" width="50%" valign="middle">
+<a href="https://raw.githubusercontent.com/108design/moodle-local_moveactivities/main/docs/screenshots/copy-move-entry.jpg"><img src="https://raw.githubusercontent.com/108design/moodle-local_moveactivities/main/docs/screenshots/copy-move-entry.jpg" width="300" height="135" alt="Select the source and target courses"></a><br>
+<sub>Select the source and target courses</sub>
+</td>
+<td align="center" width="50%" valign="middle">
+<a href="https://raw.githubusercontent.com/108design/moodle-local_moveactivities/main/docs/screenshots/copy-move-activities.jpg"><img src="https://raw.githubusercontent.com/108design/moodle-local_moveactivities/main/docs/screenshots/copy-move-activities.jpg" width="279" height="160" alt="Filter and select activities to copy or move"></a><br>
+<sub>Filter and select activities to copy or move</sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="50%" valign="middle">
+<a href="https://raw.githubusercontent.com/108design/moodle-local_moveactivities/main/docs/screenshots/copy-move-move-alert.jpg"><img src="https://raw.githubusercontent.com/108design/moodle-local_moveactivities/main/docs/screenshots/copy-move-move-alert.jpg" width="270" height="160" alt="Review the warning before moving activities"></a><br>
+<sub>Review the warning before moving activities</sub>
+</td>
+<td align="center" width="50%" valign="middle">
+<a href="https://raw.githubusercontent.com/108design/moodle-local_moveactivities/main/docs/screenshots/copy-move-move-warning.jpg"><img src="https://raw.githubusercontent.com/108design/moodle-local_moveactivities/main/docs/screenshots/copy-move-move-warning.jpg" width="282" height="160" alt="Confirm deletion of the source activities"></a><br>
+<sub>Confirm deletion of the source activities</sub>
+</td>
+</tr>
+</table>
+
+</details>
+
 ## What it does
 
 - Select source and target course
