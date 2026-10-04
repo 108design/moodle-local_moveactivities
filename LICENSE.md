@@ -1,4 +1,4 @@
-# 108design Move Activities Software License
+# 108design Bulk Activity Transfer Software License
 
 Copyright © 2026 Andreas Giesen <andreas@108design.com>. All rights reserved.
 
@@ -7,7 +7,7 @@ open-source license. The Software is licensed, not sold.
 
 ## 1. Definitions
 
-“Software” means this Move Activities plugin distribution and its documentation,
+“Software” means this Bulk Activity Transfer plugin distribution and its documentation,
 excluding Third-Party Components identified below. “Author” means Andreas
 Giesen. “Licensee” means the person or legal entity exercising rights under
 this license. “Free Features” and “Pro Features” mean features designated as

@@ -1,6 +1,6 @@
-# Move Activities for Moodle
+# Bulk Activity Transfer
 
-Bulk move activities from one course to another with fewer clicks.
+Copy or move multiple activities between Moodle courses in one background job.
 
 ## What it does
 
