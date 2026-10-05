@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/108design/moodle-local_moveactivities/main/docs/branding/logo.svg" alt="Bulk Activity Transfer logo" width="443" height="443">
+</p>
+
 # Bulk Activity Transfer
 
 Copy or move multiple activities between Moodle courses in one background job.
