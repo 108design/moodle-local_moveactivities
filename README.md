@@ -53,7 +53,7 @@ The UI queues a background job and returns quickly to avoid request timeouts.
 
 ## Compatibility
 
-- Moodle 4.5 through 5.2 inclusive
+- Moodle 4.5 through 5.3 inclusive
 - PHP versions supported by the selected Moodle release
 
 
