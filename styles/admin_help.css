@@ -111,3 +111,41 @@ body.local-moveactivities-help-legacy-drawers.local-moveactivities-help-open .dr
 .local-moveactivities-help-content article > h3 {
     font-size: 1rem; font-weight: 600; line-height: 1.4; margin: 0 0 .75rem;
 }
+
+/* Shared help identity: original 24px SVG above close, close beside the topic selector. */
+.local-moveactivities-help-header-branded {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 2.25rem;
+    grid-template-rows: auto auto;
+    column-gap: 1rem;
+    row-gap: .35rem;
+    align-items: center;
+}
+.local-moveactivities-help-header-branded .local-moveactivities-help-choices { display: contents; }
+.local-moveactivities-help-header-branded .local-moveactivities-help-choices > label {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+}
+.local-moveactivities-help-header-branded .local-moveactivities-help-choices > select {
+    grid-column: 1;
+    grid-row: 2;
+    min-width: 0;
+}
+.local-moveactivities-help-brand {
+    grid-column: 2;
+    grid-row: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    justify-self: center;
+    width: 1.5625rem;
+    height: 1.5rem;
+    cursor: default;
+}
+.local-moveactivities-help-brand img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.local-moveactivities-help-header-branded .local-moveactivities-help-close {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: center;
+}

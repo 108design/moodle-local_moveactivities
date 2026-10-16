@@ -85,10 +85,18 @@ final class admin_help {
         ]) . \html_writer::tag('select', $options, [
             'id' => 'local-moveactivities-help-topic', 'class' => 'form-select custom-select',
         ]);
+        // Shared help-panel identity: no link or action; close remains beside the topic selector.
+        $brand = \html_writer::tag('span', \html_writer::empty_tag('img', [
+            'src' => $PAGE->get_renderer('core')->image_url('helpbrand', 'local_moveactivities')->out(false),
+            'alt' => '', 'width' => 25, 'height' => 24,
+        ]), [
+            'class' => 'local-moveactivities-help-brand', 'role' => 'img', 'aria-label' => '108design',
+            'title' => '108design', 'tabindex' => '0', 'data-toggle' => 'tooltip', 'data-bs-toggle' => 'tooltip',
+        ]);
         $header = \html_writer::tag('header', \html_writer::tag('h2', $title, [
             'id' => 'local-moveactivities-context-help-title', 'class' => 'sr-only visually-hidden', 'tabindex' => '-1',
-        ]) . \html_writer::div($choice, 'local-moveactivities-help-choices') . $close,
-            ['class' => 'local-moveactivities-help-header']);
+        ]) . \html_writer::div($choice, 'local-moveactivities-help-choices') . $brand . $close,
+            ['class' => 'local-moveactivities-help-header local-moveactivities-help-header-branded']);
         return \html_writer::tag('aside', $header
             . \html_writer::div($articles, 'local-moveactivities-help-content', ['tabindex' => '0']), [
                 'id' => 'local-moveactivities-context-help', 'class' => 'local-moveactivities-context-help',
