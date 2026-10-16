@@ -84,3 +84,12 @@ $string['privacy:metadata:item:status'] = 'The processing status of the activity
 $string['privacy:metadata:item:message'] = 'The processing result or error message.';
 $string['privacy:metadata:item:timecreated'] = 'When the job item was created.';
 $string['privacy:metadata:item:timemodified'] = 'When the job item was last updated.';
+
+// Contextual administration help.
+$string['adminhelp'] = 'Administration help';
+$string['adminhelpmore'] = 'More in the help panel';
+$string['adminhelptopics'] = 'Help Topics';
+$string['adminhelp_overview'] = 'Transferring activities';
+$string['adminhelp_overview_article'] = '<p>Select the source course, target course and activities. Before starting, check whether the selected action copies or moves content and whether the intended target section is selected.</p><p>You need the appropriate source, target and Moodle backup or restore permissions. Back up important content before larger transfers.</p>';
+$string['adminhelp_results'] = 'Jobs and results';
+$string['adminhelp_results_article'] = '<p>Check the job status, then inspect the transferred activities in the target course. Starting a job does not confirm that the transfer is complete.</p><p>If an error occurs, review the existing job\'s result before starting the same selection again. This helps avoid unintended duplicate copies.</p>';
