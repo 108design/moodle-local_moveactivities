@@ -20,6 +20,8 @@ use context;
 use context_system;
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\approved_userlist;
+use core_privacy\local\request\userlist;
 use core_privacy\local\request\contextlist;
 use core_privacy\local\request\transform;
 use core_privacy\local\request\writer;
@@ -31,7 +33,8 @@ defined('MOODLE_INTERNAL') || die();
  */
 class provider implements
         \core_privacy\local\metadata\provider,
-        \core_privacy\local\request\plugin\provider {
+        \core_privacy\local\request\plugin\provider,
+        \core_privacy\local\request\core_userlist_provider {
 
     /**
      * Describe stored personal data.
@@ -73,6 +76,24 @@ class provider implements
             ['contextid' => context_system::instance()->id, 'userid' => $userid]
         );
         return $contextlist;
+    }
+
+    /** Identify job owners only in the system context where this plugin stores history. */
+    public static function get_users_in_context(userlist $userlist): void {
+        if ($userlist->get_context()->contextlevel !== CONTEXT_SYSTEM) {
+            return;
+        }
+        $userlist->add_from_sql('userid', 'SELECT DISTINCT userid FROM {local_moveactivities_job}', []);
+    }
+
+    /** Delete only the approved owners and their dependent job items. */
+    public static function delete_data_for_users(approved_userlist $userlist): void {
+        if ($userlist->get_context()->contextlevel !== CONTEXT_SYSTEM) {
+            return;
+        }
+        foreach ($userlist->get_userids() as $userid) {
+            self::delete_user_jobs((int)$userid);
+        }
     }
 
     /**
@@ -134,12 +155,18 @@ class provider implements
         if (!in_array(context_system::instance()->id, $contextlist->get_contextids(), true)) {
             return;
         }
+        self::delete_user_jobs((int)$contextlist->get_user()->id);
+    }
+
+    /** Remove one approved owner's jobs and their dependent items. */
+    private static function delete_user_jobs(int $userid): void {
+        global $DB;
         $jobids = $DB->get_fieldset_select('local_moveactivities_job', 'id', 'userid = :userid',
-            ['userid' => $contextlist->get_user()->id]);
+            ['userid' => $userid]);
         if ($jobids) {
             [$insql, $params] = $DB->get_in_or_equal($jobids, SQL_PARAMS_NAMED);
             $DB->delete_records_select('local_moveactivities_item', "jobid $insql", $params);
         }
-        $DB->delete_records('local_moveactivities_job', ['userid' => $contextlist->get_user()->id]);
+        $DB->delete_records('local_moveactivities_job', ['userid' => $userid]);
     }
 }

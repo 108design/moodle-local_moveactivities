@@ -1,0 +1,44 @@
+{{!
+This file is part of a 108design source-available software product.
+
+Use and modification are permitted only under the Software License included
+with this distribution. See LICENSE.md for the full terms.
+
+File documentation for templates/confirm_move.mustache.
+
+@package   local_moveactivities
+@copyright 2026 Andreas Giesen <andreas@108design.com>
+@license   See LICENSE.md for the full terms.
+}}
+{{!
+    Copyright (C) 2026 Andreas Giesen <andreas@108design.com>
+    @package local_moveactivities
+    @license See LICENSE.md for the full terms.
+}}
+{{!
+    @template local_moveactivities/confirm_move
+    Context: url, hidden(name/value)[], source, target, activities(label)[], native help HTML.
+}}
+<div class="card p-3">
+    <div class="d-flex align-items-center gap-2 mb-3">
+        <h2 class="h4 m-0">{{#str}}confirmmove, local_moveactivities{{/str}}</h2>
+        {{{actionhelp}}} {{{transferinfo}}}
+    </div>
+    <p class="alert alert-danger">{{#str}}moveconfirmquestion, local_moveactivities{{/str}}</p>
+    <dl>
+        <dt>{{#str}}sourcecourse, local_moveactivities{{/str}}</dt><dd>{{source}}</dd>
+        <dt>{{#str}}targetcourse, local_moveactivities{{/str}}</dt><dd>{{target}}</dd>
+    </dl>
+    <ul>{{#activities}}<li>{{label}}</li>{{/activities}}</ul>
+    <div class="d-flex gap-2 flex-wrap">
+        <form method="post" action="{{url}}">
+            {{#hidden}}<input type="hidden" name="{{name}}" value="{{value}}">{{/hidden}}
+            <input type="hidden" name="confirmmove" value="1">
+            <button type="submit" name="enqueue" value="1" class="btn btn-danger">{{#str}}confirmmove, local_moveactivities{{/str}}</button>
+        </form>
+        <form method="post" action="{{url}}">
+            {{#hidden}}<input type="hidden" name="{{name}}" value="{{value}}">{{/hidden}}
+            <button type="submit" name="load" value="1" class="btn btn-secondary">{{#str}}cancel{{/str}}</button>
+        </form>
+    </div>
+</div>

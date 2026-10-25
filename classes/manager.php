@@ -31,51 +31,16 @@ class manager {
     public const CHUNK_SIZE = 3;
 
     /**
-     * Return course options user can access.
-     *
-     * @return array<int,string>
+     * Preload only the explicitly selected courses; AJAX supplies search results.
+     * @param array $courseids Selected course IDs.
+     * @param string $purpose Source or target.
+     * @return array<int,string> Plain course labels.
      */
-    public static function get_course_options(): array {
-        global $DB;
-
-        $courses = $DB->get_records_select('course', 'id <> :siteid', ['siteid' => SITEID], 'fullname ASC', 'id, fullname');
+    public static function get_course_autocomplete_options(array $courseids = [], string $purpose = 'source'): array {
         $options = [];
-        foreach ($courses as $course) {
-            $context = context_course::instance($course->id);
-            if (has_capability('local/moveactivities:move', $context)) {
-                $options[(int)$course->id] = format_string($course->fullname, true, ['context' => $context]);
-            }
+        foreach (array_unique(array_map('intval', $courseids)) as $id) {
+            $options += \local_moveactivities\local\course_selector::selected($id, $purpose);
         }
-
-        return $options;
-    }
-
-    /**
-     * Return labelled course options incl. id/shortname/idnumber for autocomplete display.
-     *
-     * @return array<int,string>
-     */
-    public static function get_course_autocomplete_options(): array {
-        global $DB;
-
-        $courses = $DB->get_records_select('course', 'id <> :siteid', ['siteid' => SITEID], 'fullname ASC',
-            'id, fullname, shortname, idnumber');
-        $options = [];
-        foreach ($courses as $course) {
-            $context = context_course::instance($course->id);
-            if (!has_capability('local/moveactivities:move', $context)) {
-                continue;
-            }
-            $label = format_string($course->fullname, true, ['context' => $context]) . ' [ID:' . (int)$course->id . ']';
-            if (!empty($course->shortname)) {
-                $label .= ' | ' . $course->shortname;
-            }
-            if (!empty($course->idnumber)) {
-                $label .= ' | #' . $course->idnumber;
-            }
-            $options[(int)$course->id] = $label;
-        }
-
         return $options;
     }
 
@@ -169,7 +134,10 @@ class manager {
         global $DB;
 
         if (!$usesourcename) {
-            course_create_sections_if_missing($targetcourseid, [1]);
+            if (!$DB->record_exists('course_sections', ['course' => $targetcourseid, 'section' => 1])) {
+                require_capability('moodle/course:update', context_course::instance($targetcourseid));
+                course_create_sections_if_missing($targetcourseid, [1]);
+            }
             return 1;
         }
 
@@ -185,6 +153,7 @@ class manager {
             $maxsection = max($maxsection, (int)$section->section);
         }
 
+        require_capability('moodle/course:update', context_course::instance($targetcourseid));
         $newsectionnum = $maxsection + 1;
         course_create_sections_if_missing($targetcourseid, [$newsectionnum]);
         rebuild_course_cache($targetcourseid, true);
@@ -215,6 +184,10 @@ class manager {
             require_capability('local/moveactivities:move', context_course::instance($targetcourseid));
             require_capability('moodle/backup:backupactivity', context_module::instance($cmid));
             require_capability('moodle/restore:restoreactivity', context_course::instance($targetcourseid));
+
+            if ($deletesource) {
+                require_capability('moodle/course:manageactivities', context_module::instance($cmid));
+            }
 
             $before = array_keys(get_fast_modinfo($targetcourseid)->get_cms());
 
@@ -261,6 +234,8 @@ class manager {
             moveto_module($newcm, $targetsection);
 
             if ($deletesource) {
+                // Recheck at the destructive operation after the potentially lengthy restore.
+                require_capability('moodle/course:manageactivities', context_module::instance($cmid));
                 $deleted = course_delete_module($cmid);
                 if (!$deleted) {
                     // Some module flows may return false even when deletion already happened.
@@ -298,9 +273,16 @@ class manager {
         array $cmids,
         array $activitylabels
     ): int {
-        global $DB;
+        global $DB, $USER;
 
-        $targetsectionmode = $targetsectionmode === 'sourcecoursename' ? 'sourcecoursename' : 'first';
+        if ($userid !== (int)$USER->id || !in_array($targetsectionmode, ['sourcecoursename', 'first'], true)) {
+            throw new \invalid_parameter_exception('Invalid job owner or destination mode');
+        }
+        // Derive labels from the current modules rather than accepting caller-supplied metadata.
+        $activitylabels = \local_moveactivities\local\transfer_selection::validate(
+            $sourcecourseid, $targetcourseid, $cmids, $deletesource
+        );
+        $cmids = array_keys($activitylabels);
         $now = time();
         $job = (object)[
             'userid' => $userid,
@@ -350,7 +332,11 @@ class manager {
         }
 
         try {
-            $job = $DB->get_record('local_moveactivities_job', ['id' => $jobid], '*', MUST_EXIST);
+            $job = $DB->get_record('local_moveactivities_job', ['id' => $jobid]);
+            if (!$job) {
+                // Privacy erasure may have removed a job while its task was queued.
+                return;
+            }
             if (in_array($job->status, ['done', 'done_with_errors'], true)) {
                 return;
             }
@@ -358,6 +344,9 @@ class manager {
             $job->timemodified = time();
             $DB->update_record('local_moveactivities_job', $job);
 
+            require_capability('local/moveactivities:move', context_course::instance($job->sourcecourseid));
+            require_capability('local/moveactivities:move', context_course::instance($job->targetcourseid));
+            require_capability('moodle/restore:restoreactivity', context_course::instance($job->targetcourseid));
             $sourcecourse = get_course((int)$job->sourcecourseid);
             $targetsectionnum = self::resolve_target_sectionnum(
                 (int)$job->targetcourseid,
@@ -414,6 +403,13 @@ class manager {
     public static function retry_failed_items(int $jobid, int $userid): void {
         global $DB;
         $job = $DB->get_record('local_moveactivities_job', ['id' => $jobid, 'userid' => $userid], '*', MUST_EXIST);
+        global $USER;
+        if ($userid !== (int)$USER->id) {
+            throw new \invalid_parameter_exception('Invalid retry owner');
+        }
+        require_capability('local/moveactivities:move', context_course::instance($job->sourcecourseid));
+        require_capability('local/moveactivities:move', context_course::instance($job->targetcourseid));
+        require_capability('moodle/restore:restoreactivity', context_course::instance($job->targetcourseid));
         $faileditems = $DB->get_records('local_moveactivities_item', ['jobid' => $jobid, 'status' => 'failed']);
         foreach ($faileditems as $item) {
             $item->status = 'queued';

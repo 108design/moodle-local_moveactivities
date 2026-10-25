@@ -40,9 +40,9 @@ Click a preview to open the full-size screenshot.
 
 ## What it does
 
-- Select source and target course
-- Select multiple activities from source course
-- Choose action mode: **Move** or **Copy only**
+- Search for source and target courses by name, short name, ID number or numeric course ID.
+- Filter the source activities by type or section and select the activities to transfer.
+- Choose Copy only (the default) or Move. Move shows a separate confirmation with the selected courses and activities before it queues the job.
 - Process in background job:
   1. Backup selected activity
   2. Restore into target course
@@ -67,9 +67,11 @@ After installation:
 
 ## Required capabilities
 
-- `local/moveactivities:move`
-- `moodle/backup:backupactivity`
-- `moodle/restore:restoreactivity`
+- `local/moveactivities:move` in both courses
+- `moodle/backup:backupactivity` for each source activity
+- `moodle/restore:restoreactivity` in the target course
+- `moodle/course:manageactivities` for each source activity when moving
+- `moodle/course:update` in the target course when a destination section needs to be created
 
 Default role grants in this plugin:
 
@@ -85,8 +87,12 @@ Privacy API provider supports metadata declaration, export, and deletion.
 ## Following a job
 
 Moodle cron must run regularly to process queued jobs. Open the job page to follow
-each activity's progress and retry failed items. Jobs use the permissions of the
-person who started them; that person must retain access to both courses.
+each activity's progress and retry failed items. You see only your own jobs.
+Jobs run as the person who started them and check their current permissions during
+processing. A move deletes the original activity only after the copy has been restored.
+
+The question-mark buttons explain individual fields. Information icons link to the
+transfer or job-results topic in the help panel. English and German interfaces are available.
 
 ## License
 

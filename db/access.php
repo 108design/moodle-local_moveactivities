@@ -11,6 +11,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
     'local/moveactivities:move' => [
+        'riskbitmask' => RISK_DATALOSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [

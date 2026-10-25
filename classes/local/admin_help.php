@@ -1,4 +1,16 @@
 <?php
+/**
+ * This file is part of a 108design source-available software product.
+ *
+ * Use and modification are permitted only under the Software License included
+ * with this distribution. See LICENSE.md for the full terms.
+ *
+ * File documentation for classes/local/admin_help.php.
+ *
+ * @package   local_moveactivities
+ * @copyright 2026 Andreas Giesen
+ * @license   See LICENSE.md for the full terms.
+ */
 // Copyright (C) 2026 Andreas Giesen. See LICENSE.md.
 namespace local_moveactivities\local;
 
@@ -12,13 +24,14 @@ final class admin_help {
     /** Register only the permitted settings page before its header is rendered. */
     public static function prepare(\core\hook\output\before_http_headers $hook): void {
         global $CFG, $PAGE;
-        if (self::$prepared || admin_branding::page_capability() === null) {
+        if (self::$prepared || !self::can_view_page()) {
             return;
         }
         $PAGE->add_body_class('local-moveactivities-admin-help-page');
         self::$prepared = true;
         $PAGE->requires->css(new \moodle_url('/local/moveactivities/styles/admin_help.css', [
             'rev' => get_config('local_moveactivities', 'version'),
+            'theme' => theme_get_revision(),
         ]));
         $module = (int)$CFG->version < 2025041400 ? 'admin_help_legacy' : 'admin_help';
         $PAGE->requires->js_call_amd('local_moveactivities/admin_help_form', 'init');
@@ -27,15 +40,33 @@ final class admin_help {
         ]]);
     }
 
+    /** Show selection help to course operators and job help on the authenticated own-history page. */
+    private static function can_view_page(): bool {
+        global $PAGE;
+        if (during_initial_install() || !isloggedin() || isguestuser()
+                || (int)$PAGE->context->contextlevel !== CONTEXT_SYSTEM) {
+            return false;
+        }
+        $isindex = $PAGE->url->compare(new \moodle_url('/local/moveactivities/index.php'), URL_MATCH_BASE);
+        $isjobs = $PAGE->url->compare(new \moodle_url('/local/moveactivities/jobs.php'), URL_MATCH_BASE);
+        if (!$isindex && !$isjobs) {
+            return false;
+        }
+        return $isjobs || course_selector::can_use();
+    }
+
     /** Native popover with concise guidance and a direct link to the extended topic. */
     public static function icon(string $key): string {
         global $CFG, $PAGE;
         if (!in_array($key, self::TOPICS, true)) {
             throw new \coding_exception('Unknown Administration help topic.');
         }
+        if (defined('CLI_SCRIPT') && CLI_SCRIPT) {
+            return '';
+        }
         $url = new \moodle_url($PAGE->url);
         $url->param('moveactivitieshelp', $key);
-        $help = new \help_icon($key, 'local_moveactivities', $url->out(false));
+        $help = new \help_icon('adminhelp_' . $key, 'local_moveactivities', $url->out(false));
         $renderer = $PAGE->get_renderer('core');
         $data = (array)$help->export_for_template($renderer);
         $data['completedoclink'] = \html_writer::link($url, get_string('adminhelpmore', 'local_moveactivities'));
@@ -72,7 +103,11 @@ final class admin_help {
         ]);
         $options = '';
         $articles = '';
-        foreach (self::TOPICS as $topic) {
+        $topics = self::TOPICS;
+        if ($PAGE->url->compare(new \moodle_url('/local/moveactivities/jobs.php'), URL_MATCH_BASE)) {
+            $topics = array_reverse($topics);
+        }
+        foreach ($topics as $topic) {
             $label = get_string('adminhelp_' . $topic, 'local_moveactivities');
             $options .= \html_writer::tag('option', $label, ['value' => $topic]);
             $articles .= \html_writer::tag('article', \html_writer::tag('h3', $label, ['class' => 'h5', 'tabindex' => '-1'])

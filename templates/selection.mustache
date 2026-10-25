@@ -1,0 +1,134 @@
+{{!
+This file is part of a 108design source-available software product.
+
+Use and modification are permitted only under the Software License included
+with this distribution. See LICENSE.md for the full terms.
+
+File documentation for templates/selection.mustache.
+
+@package   local_moveactivities
+@copyright 2026 Andreas Giesen <andreas@108design.com>
+@license   See LICENSE.md for the full terms.
+}}
+{{!
+    Copyright (C) 2026 Andreas Giesen <andreas@108design.com>
+    @package local_moveactivities
+    @license See LICENSE.md for the full terms.
+}}
+{{!
+    @template local_moveactivities/selection
+    Context: url, sesskey, jobsurl; sourceoptions/targetoptions/activities/filter/mode
+    arrays with value/label/selected; showsourcehint, hasactivities, ismove; native help HTML.
+}}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <h2 class="h4 m-0">{{#str}}moveactivities, local_moveactivities{{/str}}</h2>
+    <div class="d-inline-flex align-items-center gap-2">
+        <a href="{{jobsurl}}" class="btn btn-secondary">{{#str}}viewjobs, local_moveactivities{{/str}}</a>
+        {{{resultsinfo}}}
+    </div>
+</div>
+<form method="post" action="{{url}}" class="card p-3 local-moveactivities-selection" id="moveactivities-form">
+    <input type="hidden" name="sesskey" value="{{sesskey}}">
+    <div class="row mb-3">
+        <div class="col-lg-6 mb-3">
+            <div class="d-flex align-items-center mb-1">
+                <label for="sourcecourseid" class="form-label mb-0 fw-bold font-weight-bold">{{#str}}sourcecourse, local_moveactivities{{/str}}</label>
+                <span class="ms-auto">{{{sourcecoursehelp}}}</span>
+            </div>
+            <div class="local-moveactivities-course-control">
+                <select name="sourcecourseid" id="sourcecourseid" class="form-select custom-select" data-course-purpose="source">
+                    <option value=""></option>
+                    {{#sourceoptions}}<option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>{{/sourceoptions}}
+                </select>
+                <span data-transfer-help-field="sourcecourseid">{{{transferinfo}}}</span>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-3">
+            <div class="d-flex align-items-center mb-1">
+                <label for="targetcourseid" class="form-label mb-0 fw-bold font-weight-bold">{{#str}}targetcourse, local_moveactivities{{/str}}</label>
+                <span class="ms-auto">{{{targetcoursehelp}}}</span>
+            </div>
+            <div class="local-moveactivities-course-control">
+                <select name="targetcourseid" id="targetcourseid" class="form-select custom-select" data-course-purpose="target">
+                    <option value=""></option>
+                    {{#targetoptions}}<option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>{{/targetoptions}}
+                </select>
+                <span data-transfer-help-field="targetcourseid">{{{transferinfo}}}</span>
+            </div>
+        </div>
+        <p class="form-text col-12 mb-0">{{#str}}coursehint, local_moveactivities{{/str}}</p>
+    </div>
+    <div class="row">
+        <div class="col-lg-7 mb-3">
+            <div class="d-flex align-items-center mb-2">
+                <h3 class="h6 m-0" id="transfer-activities-label">{{#str}}activities, local_moveactivities{{/str}}</h3>
+                <span class="ms-auto">{{{activitieshelp}}}</span>
+            </div>
+            {{#showsourcehint}}<p class="alert alert-info">{{#str}}selectsourcefirst, local_moveactivities{{/str}}</p>{{/showsourcehint}}
+            {{^showsourcehint}}{{^hasactivities}}<p class="alert alert-warning">{{#str}}noactivities, local_moveactivities{{/str}}</p>{{/hasactivities}}{{/showsourcehint}}
+            {{#hasactivities}}
+                <div class="d-flex gap-2 mb-2 flex-wrap">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-transfer-select="all">{{#str}}selectallvisible, local_moveactivities{{/str}}</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-transfer-select="none">{{#str}}clearselection, local_moveactivities{{/str}}</button>
+                </div>
+                <div class="local-moveactivities-activity-list border rounded p-2" role="group" aria-labelledby="transfer-activities-label">
+                    {{#activities}}
+                        <div class="form-check mb-2">
+                            <input type="checkbox" name="cmids[]" value="{{value}}" class="form-check-input" id="cmid_{{value}}" {{#selected}}checked{{/selected}}>
+                            <label class="form-check-label ms-2" for="cmid_{{value}}">{{label}}</label>
+                        </div>
+                    {{/activities}}
+                </div>
+            {{/hasactivities}}
+            <div class="d-flex gap-2 flex-wrap mt-3">
+                <button type="submit" name="load" value="1" class="btn btn-secondary">{{#str}}loadactivities, local_moveactivities{{/str}}</button>
+                {{^showsourcehint}}<button type="submit" name="resetfilters" value="1" class="btn btn-outline-secondary">{{#str}}resetfilters, local_moveactivities{{/str}}</button>{{/showsourcehint}}
+            </div>
+        </div>
+        <div class="col-lg-5 mb-3">
+            <div class="border rounded p-3 h-100 d-flex flex-column">
+                {{^showsourcehint}}
+                    <div class="d-flex align-items-center mb-1">
+                        <label for="modtypes" class="form-label mb-0">{{#str}}activitytypefilter, local_moveactivities{{/str}}</label>
+                        <span class="ms-auto">{{{activitytypefilterhelp}}}</span>
+                    </div>
+                    <select multiple name="modtypes[]" id="modtypes" class="form-select custom-select mb-3" size="6">
+                        {{#modtypeoptions}}<option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>{{/modtypeoptions}}
+                    </select>
+                    <div class="d-flex align-items-center mb-1">
+                        <label for="sections" class="form-label mb-0">{{#str}}sectionfilter, local_moveactivities{{/str}}</label>
+                        <span class="ms-auto">{{{sectionfilterhelp}}}</span>
+                    </div>
+                    <select multiple name="sections[]" id="sections" class="form-select custom-select mb-3" size="6">
+                        {{#sectionoptions}}<option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>{{/sectionoptions}}
+                    </select>
+                {{/showsourcehint}}
+                <div class="d-flex align-items-center mb-1">
+                    <label for="targetsectionmode" class="form-label mb-0 fw-bold font-weight-bold">{{#str}}targetsectionmode, local_moveactivities{{/str}}</label>
+                    <span class="ms-auto">{{{targetsectionmodehelp}}}</span>
+                </div>
+                <div class="local-moveactivities-control-help mb-3">
+                    <select name="targetsectionmode" id="targetsectionmode" class="form-select custom-select">
+                        {{#sectionmodes}}<option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>{{/sectionmodes}}
+                    </select>
+                    {{{transferinfo}}}
+                </div>
+                <div class="d-flex align-items-center mb-1">
+                    <label for="actionmode" class="form-label mb-0 fw-bold font-weight-bold">{{#str}}actionmode, local_moveactivities{{/str}}</label>
+                    <span class="ms-auto">{{{actionmodehelp}}}</span>
+                </div>
+                <div class="local-moveactivities-control-help mb-3">
+                    <select name="actionmode" id="actionmode" class="form-select custom-select">
+                        {{#actionmodes}}<option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>{{/actionmodes}}
+                    </select>
+                    {{{transferinfo}}}
+                </div>
+                <p class="alert alert-danger py-2 px-3 mb-3" data-transfer-warning {{^ismove}}hidden{{/ismove}}>{{#str}}moveconfirmwarning, local_moveactivities{{/str}}</p>
+                <div class="mt-auto"></div>
+                <div class="local-moveactivities-actions card">
+                    <button type="submit" name="enqueue" value="1" data-transfer-enqueue class="btn {{#ismove}}btn-danger{{/ismove}}{{^ismove}}btn-primary{{/ismove}} w-100">{{#str}}enqueue, local_moveactivities{{/str}}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,70 @@
+{{!
+This file is part of a 108design source-available software product.
+
+Use and modification are permitted only under the Software License included
+with this distribution. See LICENSE.md for the full terms.
+
+File documentation for templates/jobs.mustache.
+
+@package   local_moveactivities
+@copyright 2026 Andreas Giesen <andreas@108design.com>
+@license   See LICENSE.md for the full terms.
+}}
+{{!
+    Copyright (C) 2026 Andreas Giesen <andreas@108design.com>
+    @package local_moveactivities
+    @license See LICENSE.md for the full terms.
+}}
+{{!
+    @template local_moveactivities/jobs
+    Context: selectionurl, url, refreshurl, sesskey, hasjobs, jobs[],
+    hasrunningjobs, optional detail(id/canretry/items[]), native jobshelp/resultsinfo HTML.
+}}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <div class="d-inline-flex align-items-center gap-2">
+        <h2 class="h4 m-0">{{#str}}jobs, local_moveactivities{{/str}}</h2>
+        {{{jobshelp}}} {{{resultsinfo}}}
+    </div>
+    <a href="{{selectionurl}}" class="btn btn-secondary">{{#str}}backtoselection, local_moveactivities{{/str}}</a>
+</div>
+{{^hasjobs}}<p class="alert alert-info">{{#str}}nojobsyet, local_moveactivities{{/str}}</p>{{/hasjobs}}
+{{#hasjobs}}
+<div class="table-responsive">
+    <table class="table generaltable">
+        <thead><tr>
+            <th scope="col">{{#str}}jobid, local_moveactivities{{/str}}</th>
+            <th scope="col">{{#str}}source, local_moveactivities{{/str}}</th>
+            <th scope="col">{{#str}}target, local_moveactivities{{/str}}</th>
+            <th scope="col">{{#str}}action, local_moveactivities{{/str}}</th>
+            <th scope="col">{{#str}}status, local_moveactivities{{/str}}</th>
+            <th scope="col">{{#str}}progress, local_moveactivities{{/str}}</th>
+            <th scope="col">{{#str}}created, local_moveactivities{{/str}}</th>
+            <th scope="col">{{#str}}modified, local_moveactivities{{/str}}</th>
+            <th scope="col">{{#str}}details, local_moveactivities{{/str}}</th>
+        </tr></thead>
+        <tbody>{{#jobs}}<tr>
+            <th scope="row">#{{id}}</th><td>{{source}}</td><td>{{target}}</td><td>{{action}}</td>
+            <td>{{status}}</td><td>{{progress}}</td><td>{{created}}</td><td>{{modified}}</td>
+            <td>{{#shown}}—{{/shown}}{{^shown}}<a href="{{detailsurl}}">{{#str}}details, local_moveactivities{{/str}}</a>{{/shown}}</td>
+        </tr>{{/jobs}}</tbody>
+    </table>
+</div>
+<div class="d-flex gap-2 align-items-center flex-wrap mt-2 mb-3">
+    <a href="{{refreshurl}}" class="btn btn-secondary">{{#str}}refreshnow, local_moveactivities{{/str}}</a>
+    {{#hasrunningjobs}}<p class="text-muted m-0">{{#str}}autorefreshhint, local_moveactivities{{/str}}</p>{{/hasrunningjobs}}
+</div>
+{{/hasjobs}}
+{{#detail}}
+<section aria-labelledby="transfer-job-detail">
+    <h3 class="h5 mt-4" id="transfer-job-detail">{{#str}}details, local_moveactivities{{/str}} #{{id}}</h3>
+    {{#canretry}}
+    <form method="post" action="{{url}}" class="mb-3">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <button type="submit" name="retryjobid" value="{{id}}" class="btn btn-secondary">{{#str}}retryfailed, local_moveactivities{{/str}}</button>
+    </form>
+    {{/canretry}}
+    <ul class="list-group">
+        {{#items}}<li class="list-group-item">[{{status}}] {{name}}{{#message}} — {{message}}{{/message}}</li>{{/items}}
+    </ul>
+</section>
+{{/detail}}

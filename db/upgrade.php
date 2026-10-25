@@ -59,5 +59,10 @@ function xmldb_local_moveactivities_upgrade($oldversion): bool {
         upgrade_plugin_savepoint(true, 2026051307, 'local', 'moveactivities');
     }
 
+    if ($oldversion < 2026102400) {
+        // Refresh the capability metadata, including its destructive-operation risk.
+        upgrade_plugin_savepoint(true, 2026102400, 'local', 'moveactivities');
+    }
+
     return true;
 }
