@@ -1,4 +1,11 @@
 <?php
+/**
+ * This file is part of a 108design source-available software product.
+ *
+ * Use and modification are permitted only under the Software License included
+ * with this distribution. See LICENSE.md for the full terms.
+ *
+ */
 // Copyright (C) 2026 Andreas Giesen. See LICENSE.md for the full terms.
 
 namespace local_moveactivities;
