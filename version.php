@@ -18,8 +18,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_moveactivities';
-$plugin->version = 2026102900;
+$plugin->version = 2026103000;
 $plugin->requires = 2024100700; // Moodle 4.5.
 $plugin->supported = [405, 503];
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '1.5.0';
+$plugin->release = '1.6.0';
