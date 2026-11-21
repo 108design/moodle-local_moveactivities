@@ -38,6 +38,7 @@
 "/classes/local/course_selector.php" -export-ignore -export-subst
 "/classes/local/transfer_selection.php" -export-ignore -export-subst
 "/classes/local/update_guard.php" -export-ignore -export-subst
+"/classes/local/update_notice.php" -export-ignore -export-subst
 "/classes/manager.php" -export-ignore -export-subst
 "/classes/privacy" -export-ignore -export-subst
 "/classes/privacy/provider.php" -export-ignore -export-subst
@@ -70,6 +71,7 @@
 "/pix/helpbrand.svg" -export-ignore -export-subst
 "/release-guard-policy.json" -export-ignore -export-subst
 "/release-manifest.json" -export-ignore -export-subst
+"/release-metadata.php" -export-ignore -export-subst
 "/release-signature.txt" -export-ignore -export-subst
 "/settings.php" -export-ignore -export-subst
 "/styles" -export-ignore -export-subst
@@ -85,4 +87,5 @@
 "/tests/security_test.php" -export-ignore -export-subst
 "/tests/transfer_selection_test.php" -export-ignore -export-subst
 "/update-guard.php" -export-ignore -export-subst
+"/update-notice.php" -export-ignore -export-subst
 "/version.php" -export-ignore -export-subst
