@@ -85,16 +85,13 @@ $string['privacy:metadata:item:status'] = 'The processing status of the activity
 $string['privacy:metadata:item:message'] = 'The processing result or error message.';
 $string['privacy:metadata:item:timecreated'] = 'When the job item was created.';
 $string['privacy:metadata:item:timemodified'] = 'When the job item was last updated.';
-
-// Contextual administration help.
 $string['adminhelp'] = 'Administration help';
 $string['adminhelpmore'] = 'More in the help panel';
-$string['adminhelptopics'] = 'Help Topics';
+$string['adminhelptopics'] = 'Help topics';
 $string['adminhelp_overview'] = 'Transferring activities';
 $string['adminhelp_overview_article'] = '<p>Select the source course, target course and activities. Before starting, check whether the selected action copies or moves content and whether the intended target section is selected.</p><p>You need the appropriate source, target and Moodle backup or restore permissions. Back up important content before larger transfers.</p>';
 $string['adminhelp_results'] = 'Jobs and results';
 $string['adminhelp_results_article'] = '<p>Check the job status, then inspect the transferred activities in the target course. Starting a job does not confirm that the transfer is complete.</p><p>If an error occurs, review the existing job\'s result before starting the same selection again. This helps avoid unintended duplicate copies.</p>';
-
 $string['coursesearch'] = 'Search by name, short name or course ID';
 $string['confirmmove'] = 'Confirm move';
 $string['sourcecourse_help'] = 'Search for a course where you can transfer activities. Enter at least two characters of its name, short name or ID number, or its numeric course ID. Up to 20 matching courses are shown.';
@@ -107,8 +104,6 @@ $string['actionmode_help'] = 'Copy keeps the originals. Move restores copies in 
 $string['jobs_help'] = 'This page shows your own jobs and their per-activity results. Queued and running jobs need Moodle cron. Review failures and the target course before retrying to avoid duplicate copies.';
 $string['adminhelp_overview_help'] = 'Check the source, destination, activity selection and copy or move action. The help panel explains permissions and confirmation.';
 $string['adminhelp_results_help'] = 'Starting a job does not mean the transfer has finished. The help panel explains progress, results and retries.';
-
-
 $string['updateguard_heading'] = 'Update stopped';
 $string['updateguard_component'] = 'The package for {$a} was rejected.';
 $string['updateguard_hint'] = 'Use an approved package for the installed edition. You can review the operation again.';
@@ -125,8 +120,6 @@ $string['updateguard_installed'] = 'The installed update protection is incomplet
 $string['updateguard_operation'] = 'This combination of installation actions is not supported. Start a single update operation again.';
 $string['updateguard_failed'] = 'The update could not be verified. No installation was started.';
 $string['updateguard_back'] = 'Return to plugin overview';
-
-// Optional information before native package confirmation.
 $string['updateinfo_heading'] = 'Package information: {$a}';
 $string['updateinfo_verified'] = 'The embedded publisher record matches the installed release line.';
 $string['updateinfo_missing'] = 'This package has no embedded publisher verification record.';
